@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rocket Ships — Explore the Universe</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0a0a1a;
+            color: #fff;
+            overflow-x: hidden;
+        }
+
+        /* Stars background */
+        .stars {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle var(--duration) infinite ease-in-out;
+        }
+
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; }
+            50% { opacity: 1; }
+        }
+
+        /* Hero */
+        .hero {
+            position: relative;
+            z-index: 1;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .rocket-emoji {
+            font-size: 100px;
+            animation: float 3s ease-in-out infinite;
+            margin-bottom: 30px;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(-10deg); }
+            50% { transform: translateY(-20px) rotate(-10deg); }
+        }
+
+        .hero h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 900;
+            background: linear-gradient(135deg, #ff6b35, #f7c948, #ff6b35);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 20px;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            color: #a0a0c0;
+            max-width: 600px;
+            line-height: 1.7;
+            margin-bottom: 40px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, #ff6b35, #e85d26);
+            color: #fff;
+            text-decoration: none;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 40px rgba(255, 107, 53, 0.4);
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 30px;
+            animation: bounce 2s infinite;
+            color: #555;
+            font-size: 0.9rem;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(10px); }
+        }
+
+        /* Sections */
+        section {
+            position: relative;
+            z-index: 1;
+            padding: 100px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 20px;
+            color: #f7c948;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: #888;
+            font-size: 1.1rem;
+            margin-bottom: 60px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Rocket Cards */
+        .rockets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 30px;
+        }
+
+        .rocket-card {
+            background: linear-gradient(145deg, #12122a, #1a1a3a);
+            border: 1px solid #2a2a4a;
+            border-radius: 20px;
+            padding: 40px 30px;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rocket-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 3px;
+            background: linear-gradient(90deg, #ff6b35, #f7c948, #4ecdc4);
+        }
+
+        .rocket-card:hover {
+            transform: translateY(-8px);
+            border-color: #ff6b35;
+            box-shadow: 0 20px 60px rgba(255, 107, 53, 0.15);
+        }
+
+        .rocket-card .icon {
+            font-size: 50px;
+            margin-bottom: 20px;
+        }
+
+        .rocket-card h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.4rem;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+
+        .rocket-card .company {
+            color: #ff6b35;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 15px;
+        }
+
+        .rocket-card p {
+            color: #999;
+            line-height: 1.7;
+            font-size: 0.95rem;
+        }
+
+        .rocket-card .stats {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #2a2a4a;
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.2rem;
+            color: #f7c948;
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 2px;
+            height: 100%;
+            background: linear-gradient(to bottom, #ff6b35, #4ecdc4);
+        }
+
+        .timeline-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 50px;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row-reverse;
+            text-align: right;
+        }
+
+        .timeline-content {
+            width: 45%;
+            background: #12122a;
+            border: 1px solid #2a2a4a;
+            border-radius: 15px;
+            padding: 25px;
+        }
+
+        .timeline-dot {
+            width: 16px;
+            height: 16px;
+            background: #ff6b35;
+            border-radius: 50%;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 20px rgba(255, 107, 53, 0.5);
+        }
+
+        .timeline-year {
+            font-family: 'Orbitron', sans-serif;
+            color: #f7c948;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .timeline-content h4 {
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .timeline-content p {
+            color: #888;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Fun Facts */
+        .facts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+        }
+
+        .fact-card {
+            background: #12122a;
+            border: 1px solid #2a2a4a;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .fact-card:hover {
+            border-color: #4ecdc4;
+            transform: scale(1.03);
+        }
+
+        .fact-number {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #4ecdc4;
+            margin-bottom: 10px;
+        }
+
+        .fact-card h4 {
+            margin-bottom: 8px;
+        }
+
+        .fact-card p {
+            color: #777;
+            font-size: 0.9rem;
+        }
+
+        /* Footer */
+        footer {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            padding: 60px 20px;
+            border-top: 1px solid #1a1a3a;
+            color: #555;
+        }
+
+        footer .rocket-footer {
+            font-size: 40px;
+            display: block;
+            margin-bottom: 15px;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .timeline::before { left: 20px; }
+            .timeline-item, .timeline-item:nth-child(odd) {
+                flex-direction: column;
+                align-items: flex-start;
+                padding-left: 50px;
+                text-align: left;
+            }
+            .timeline-content { width: 100%; }
+            .timeline-dot { left: 20px; }
+            .rocket-card .stats { flex-wrap: wrap; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Stars -->
+<div class="stars" id="stars"></div>
+
+<!-- Hero -->
+<div class="hero">
+    <div class="rocket-emoji">🚀</div>
+    <h1>ROCKET SHIPS</h1>
+    <p>From Earth to the stars. Explore the incredible machines that have carried humanity beyond our atmosphere and into the cosmos.</p>
+    <a href="#rockets" class="cta-btn">Explore Rockets</a>
+    <div class="scroll-hint">↓ Scroll to explore</div>
+</div>
+
+<!-- Famous Rockets -->
+<section id="rockets">
+    <h2 class="section-title">Legendary Rockets</h2>
+    <p class="section-subtitle">The machines that defined space exploration</p>
+
+    <div class="rockets-grid">
+        <div class="rocket-card">
+            <div class="icon">🏛️</div>
+            <h3>Saturn V</h3>
+            <div class="company">NASA</div>
+            <p>The most powerful rocket ever flown. Saturn V carried astronauts to the Moon during the Apollo program, standing 111 meters tall and generating 7.5 million pounds of thrust.</p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value">111m</div>
+                    <div class="stat-label">Height</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">13</div>
+                    <div class="stat-label">Flights</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">1967</div>
+                    <div class="stat-label">First Flight</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rocket-card">
+            <div class="icon">🦅</div>
+            <h3>Falcon 9</h3>
+            <div class="company">SpaceX</div>
+            <p>The rocket that revolutionized spaceflight with reusable first stages. Falcon 9 has completed over 300 missions and can land itself back on Earth after launch.</p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value">70m</div>
+                    <div class="stat-label">Height</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">300+</div>
+                    <div class="stat-label">Flights</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">2010</div>
+                    <div class="stat-label">First Flight</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rocket-card">
+            <div class="icon">⭐</div>
+            <h3>Starship</h3>
+            <div class="company">SpaceX</div>
+            <p>The largest and most powerful rocket ever built. Designed to carry humans to Mars and beyond, Starship is fully reusable and can carry over 100 tonnes to orbit.</p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value">121m</div>
+                    <div class="stat-label">Height</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">100t</div>
+                    <div class="stat-label">Payload</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">2023</div>
+                    <div class="stat-label">First Flight</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rocket-card">
+            <div class="icon">🌙</div>
+            <h3>Artemis SLS</h3>
+            <div class="company">NASA</div>
+            <p>NASA's Space Launch System is designed to take astronauts back to the Moon under the Artemis program. The most powerful rocket NASA has built since Saturn V.</p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value">98m</div>
+                    <div class="stat-label">Height</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">8.8M</div>
+                    <div class="stat-label">lbs Thrust</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">2022</div>
+                    <div class="stat-label">First Flight</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rocket-card">
+            <div class="icon">🇪🇺</div>
+            <h3>Ariane 5</h3>
+            <div class="company">ESA / Arianespace</div>
+            <p>Europe's workhorse rocket that launched the James Webb Space Telescope. Known for its exceptional reliability with over 100 successful missions.</p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value">53m</div>
+                    <div class="stat-label">Height</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">117</div>
+                    <div class="stat-label">Flights</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">1996</div>
+                    <div class="stat-label">First Flight</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="rocket-card">
+            <div class="icon">🇮🇳</div>
+            <h3>GSLV Mk III</h3>
+            <div class="company">ISRO</div>
+            <p>India's heaviest launch vehicle, also known as LVM3. It launched the Chandrayaan missions and is the backbone of India's ambitious space program.</p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-value">43m</div>
+                    <div class="stat-label">Height</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">8t</div>
+                    <div class="stat-label">Payload</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-value">2017</div>
+                    <div class="stat-label">First Flight</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Timeline -->
+<section>
+    <h2 class="section-title">Space Timeline</h2>
+    <p class="section-subtitle">Key moments in rocket history</p>
+
+    <div class="timeline">
+        <div class="timeline-item">
+            <div class="timeline-content">
+                <div class="timeline-year">1957</div>
+                <h4>Sputnik Launch 🛰️</h4>
+                <p>The Soviet Union launches Sputnik 1, the first artificial satellite, aboard an R-7 rocket. The space age begins.</p>
+            </div>
+            <div class="timeline-dot"></div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-content">
+                <div class="timeline-year">1961</div>
+                <h4>First Human in Space 👨‍🚀</h4>
+                <p>Yuri Gagarin becomes the first human in space aboard Vostok 1, completing one orbit of Earth.</p>
+            </div>
+            <div class="timeline-dot"></div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-content">
+                <div class="timeline-year">1969</div>
+                <h4>Moon Landing 🌙</h4>
+                <p>Apollo 11's Saturn V rocket carries Neil Armstrong and Buzz Aldrin to the Moon. "One small step for man..."</p>
+            </div>
+            <div class="timeline-dot"></div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-content">
+                <div class="timeline-year">1981</div>
+                <h4>Space Shuttle Era 🛸</h4>
+                <p>NASA's Space Shuttle Columbia makes its first orbital flight, beginning the era of reusable spacecraft.</p>
+            </div>
+            <div class="timeline-dot"></div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-content">
+                <div class="timeline-year">2015</div>
+                <h4>First Rocket Landing 🎯</h4>
+                <p>SpaceX successfully lands a Falcon 9 first stage, proving orbital-class rocket reusability is possible.</p>
+            </div>
+            <div class="timeline-dot"></div>
+        </div>
+
+        <div class="timeline-item">
+            <div class="timeline-content">
+                <div class="timeline-year">2024</div>
+                <h4>Starship Catches Booster 🏗️</h4>
+                <p>SpaceX catches a Super Heavy booster with the launch tower's "chopstick" arms — a first in rocket history.</p>
+            </div>
+            <div class="timeline-dot"></div>
+        </div>
+    </div>
+</section>
+
+<!-- Fun Facts -->
+<section>
+    <h2 class="section-title">Space by Numbers</h2>
+    <p class="section-subtitle">Mind-blowing facts about rocket ships</p>
+
+    <div class="facts-grid">
+        <div class="fact-card">
+            <div class="fact-number">28,000</div>
+            <h4>km/h</h4>
+            <p>Speed needed to reach orbit — that's 25x the speed of sound</p>
+        </div>
+        <div class="fact-card">
+            <div class="fact-number">$62M</div>
+            <h4>Per Launch</h4>
+            <p>Cost of a Falcon 9 launch — 10x cheaper than before SpaceX</p>
+        </div>
+        <div class="fact-card">
+            <div class="fact-number">7.5M</div>
+            <h4>lbs of Thrust</h4>
+            <p>Saturn V's thrust at liftoff — equivalent to 85 Hoover Dams</p>
+        </div>
+        <div class="fact-card">
+            <div class="fact-number">3</div>
+            <h4>Minutes</h4>
+            <p>Time for a rocket to clear Earth's atmosphere at full thrust</p>
+        </div>
+    </div>
+</section>
+
+<!-- Footer -->
+<footer>
+    <span class="rocket-footer">🚀</span>
+    <p>Built with ❤️ for space enthusiasts</p>
+    <p style="margin-top: 10px; font-size: 0.8rem;">© 2026 Rocket Ships</p>
+</footer>
+
+<script>
+    // Generate stars
+    const starsContainer = document.getElementById('stars');
+    for (let i = 0; i < 200; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        const size = Math.random() * 3;
+        star.style.width = size + 'px';
+        star.style.height = size + 'px';
+        star.style.left = Math.random() * 100 + '%';
+        star.style.top = Math.random() * 100 + '%';
+        star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+        star.style.animationDelay = Math.random() * 5 + 's';
+        starsContainer.appendChild(star);
+    }
+
+    // Smooth scroll
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelector(this.getAttribute('href')).scrollIntoView({
+                behavior: 'smooth'
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
