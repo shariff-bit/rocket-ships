@@ -138,12 +138,17 @@ async function loadState(){
     const { data, error } = await db.from("tracker").select("*");
     if(error) throw error;
     (data||[]).forEach(row=>{
-      const id = row.id.replace(/_shariff$|_adith$/,"");
-      const player = row.id.endsWith("_adith") ? "adith" : "shariff";
-      if(!state[id]) return;
-      if(row.checked) state[id][player] = true;
-      if(row.time_given) state[id].time_given = row.time_given;
-      if(row.time_done) state[id].time_done = row.time_done;
+      if(row.id.endsWith("_times")){
+        const id = row.id.replace(/_times$/,"");
+        if(!state[id]) return;
+        if(row.time_given) state[id].time_given = row.time_given;
+        if(row.time_done) state[id].time_done = row.time_done;
+      }else{
+        const id = row.id.replace(/_shariff$|_adith$/,"");
+        const player = row.id.endsWith("_adith") ? "adith" : "shariff";
+        if(!state[id]) return;
+        if(row.checked) state[id][player] = true;
+      }
     });
     setStatus("live - synced", "live");
   }catch(e){
@@ -163,8 +168,12 @@ async function saveCheck(id){
 async function saveTime(id, col, val){
   state[id][col] = val;
   const rowId = id + "_times";
-  const payload = { id: rowId, who:"shared" };
-  payload[col] = val;
+  const payload = {
+    id: rowId,
+    who: "shared",
+    time_given: state[id].time_given || "",
+    time_done: state[id].time_done || ""
+  };
   try{
     await db.from("tracker").upsert(payload);
   }catch(e){ setStatus("save failed", "err"); console.error(e); }
